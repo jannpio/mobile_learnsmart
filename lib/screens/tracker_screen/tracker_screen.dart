@@ -3,7 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '/widgets/custom_font.dart';
 
 class TrackerScreen extends StatelessWidget {
-  const TrackerScreen ({super.key});
+  const TrackerScreen({super.key});
 
   final List<_TechniqueData> techniques = const [
     _TechniqueData('Pomodoro', 67, '2h 10m this week', streak: 'Streak: 3 days'),
@@ -18,7 +18,7 @@ class TrackerScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F8FC),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,6 +38,7 @@ class TrackerScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(child: _buildPieChart(techniques)),
                   const SizedBox(width: 16),
@@ -57,7 +58,6 @@ class TrackerScreen extends StatelessWidget {
   }
 
   Widget _buildPieChart(List<_TechniqueData> data) {
-    final total = data.fold<double>(0, (sum, e) => sum + e.percent);
     return AspectRatio(
       aspectRatio: 1.2,
       child: PieChart(
@@ -130,11 +130,11 @@ class TrackerScreen extends StatelessWidget {
             ),
             if (data.streak != null)
               Row(
-                children: const [
-                  Icon(Icons.check_circle, color: Colors.green, size: 14),
-                  SizedBox(width: 4),
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green, size: 14),
+                  const SizedBox(width: 4),
                   CustomFont(
-                    text: "Streak: 3 days",
+                    text: data.streak!,
                     fontSize: 12,
                     color: Colors.green,
                   ),

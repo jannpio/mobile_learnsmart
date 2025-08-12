@@ -1,197 +1,142 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '/widgets/custom_font.dart';
 import '/screens/settings_screen/settings_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  // Dummy frontend values
-  String username = "John Doe";
-  String? avatarUrl; // null = use placeholder image
-  double totalStudyHours = 42.5;
-
-  final Map<String, double> studyHoursByActivity = {
-    "Reading": 10.5,
-    "Quizzes": 8.0,
-    "Videos": 12.0,
-    "Flashcards": 6.0,
-    "Practice": 6.0,
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 1, vsync: this);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7FAFF),
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Removes the back button
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF7FAFF),
         elevation: 0,
+        centerTitle: false,
+        title: const CustomFont(
+          text: "Profile",
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
               );
             },
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _buildProfileHeader(),
-          TabBar(
-            controller: _tabController,
-            labelColor: Colors.lightBlue,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Colors.lightBlue,
-            tabs: const [
-              Tab(text: 'Stats'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Avatar with edit icon
+            Stack(
               children: [
-                _buildStatsTab(),
+                const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage("assets/avatar.png"),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue,
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: const Icon(Icons.camera_alt,
+                        size: 18, color: Colors.white),
+                  ),
+                )
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: avatarUrl != null
-                ? NetworkImage(avatarUrl!)
-                : const AssetImage("assets/avatar.png") as ImageProvider,
-          ),
-          const SizedBox(height: 8),
-          CustomFont(
-            text: username,
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-            color: Colors.black,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsTab() {
-    final activityLabels = studyHoursByActivity.keys.toList();
-    final activityData = studyHoursByActivity.values.toList();
-
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: CustomFont(
-              text: "Learning Progress",
+            const SizedBox(height: 8),
+            const CustomFont(
+              text: "Username",
               fontSize: 16,
-              fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: CustomFont(
-            text: "Total Study Hours: 42.5 hrs",
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-            color: Colors.grey,
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: StudentBarChart(
-              data: activityData,
-              labels: activityLabels,
+            const SizedBox(height: 30),
+
+            // Personalized Recommendations
+            _sectionTitle("Personalized Recommendations"),
+            const SizedBox(height: 10),
+            _infoCard(
+              icon: Icons.circle,
+              iconColor: Colors.blue,
+              text:
+                  "Increase the use of spaced repetition over the next few days to better consolidate your learning",
             ),
-          ),
+            const SizedBox(height: 10),
+            _infoCard(
+              icon: Icons.circle,
+              iconColor: Colors.blue,
+              text:
+                  "You tend to study late at night — consider a shorter session in the morning for retention.",
+            ),
+            const SizedBox(height: 30),
+
+            // Strengths
+            _sectionTitle("Strengths"),
+            const SizedBox(height: 10),
+            _infoCard(
+              icon: Icons.check_circle,
+              iconColor: Colors.green,
+              text:
+                  "Your active recall performance has continually improved.",
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
-}
 
-class StudentBarChart extends StatelessWidget {
-  final List<double> data;
-  final List<String> labels;
+  Widget _sectionTitle(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: CustomFont(
+        text: title,
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
+    );
+  }
 
-  const StudentBarChart({super.key, required this.data, required this.labels});
-
-  @override
-  Widget build(BuildContext context) {
-    final double maxY = data.isNotEmpty ? (data.reduce((a, b) => a > b ? a : b) + 1).toDouble() : 1.0;
-
-    return BarChart(
-      BarChartData(
-        alignment: BarChartAlignment.spaceAround,
-        maxY: maxY,
-        barTouchData: BarTouchData(enabled: true),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: true, interval: (maxY / 5).ceilToDouble()),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: (value, meta) {
-                if (value.toInt() < labels.length) {
-                  return Text(labels[value.toInt()], style: const TextStyle(fontSize: 12));
-                }
-                return const Text('');
-              },
-              interval: 1,
+  Widget _infoCard({
+    required IconData icon,
+    required Color iconColor,
+    required String text,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: CustomFont(
+              text: text,
+              fontSize: 14,
+              color: Colors.black87,
             ),
           ),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        ),
-        borderData: FlBorderData(show: false),
-        barGroups: data.asMap().entries.map((entry) {
-          int index = entry.key;
-          double value = entry.value;
-          return BarChartGroupData(
-            x: index,
-            barRods: [
-              BarChartRodData(
-                toY: value,
-                color: Colors.lightBlue,
-                width: 18,
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ],
-          );
-        }).toList(),
+        ],
       ),
     );
   }
