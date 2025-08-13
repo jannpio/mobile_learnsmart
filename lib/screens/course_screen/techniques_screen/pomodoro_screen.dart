@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:learnsmart_mobile/widgets/custom_font.dart';
+import '/widgets/custom_font.dart';
 
-class PomodoroScreen extends StatelessWidget {
+class PomodoroScreen extends StatefulWidget {
   final String moduleTitle;
   const PomodoroScreen({super.key, required this.moduleTitle});
+
+  @override
+  State<PomodoroScreen> createState() => _PomodoroScreenState();
+}
+
+class _PomodoroScreenState extends State<PomodoroScreen> {
+  String focusTime = "25 mins";
+  String shortBreak = "5 mins";
+  String sessions = "4";
 
   @override
   Widget build(BuildContext context) {
@@ -17,25 +26,25 @@ class PomodoroScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: CustomFont(
-          text: "Pomodoro",
-          fontSize: 16.sp,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomFont(
-              text: "Study in short focused bursts (e.g., 25 minutes) followed by a 5-minute break to improve concentration.",
-              fontSize: 14.sp,
-              fontWeight: FontWeight.normal,
-              color: Colors.black54,
+              text: "Pomodoro",
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              "Study in short focused bursts followed by short breaks to improve concentration and reduce fatigue.",
+              style: TextStyle(fontSize: 13.sp, color: Colors.black54),
             ),
             SizedBox(height: 20.h),
+
             CustomFont(
               text: "Settings",
               fontSize: 16.sp,
@@ -43,51 +52,87 @@ class PomodoroScreen extends StatelessWidget {
               color: Colors.black,
             ),
             SizedBox(height: 10.h),
-            _buildDropdown("Focus time", ["25 mins", "30 mins", "45 mins"]),
-            _buildDropdown("Short break", ["5 mins", "10 mins", "15 mins"]),
-            _buildDropdown("Sessions", ["2", "3", "4", "5"]),
+
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF1F5),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Column(
+                children: [
+                  _buildDropdown(
+                    "Focus time",
+                    focusTime,
+                    ["15 mins", "20 mins", "25 mins", "30 mins"],
+                    (val) => setState(() => focusTime = val!),
+                  ),
+                  SizedBox(height: 10.h),
+                  _buildDropdown(
+                    "Short break",
+                    shortBreak,
+                    ["3 mins", "5 mins", "7 mins"],
+                    (val) => setState(() => shortBreak = val!),
+                  ),
+                  SizedBox(height: 10.h),
+                  _buildDropdown(
+                    "Sessions",
+                    sessions,
+                    ["2", "3", "4", "5"],
+                    (val) => setState(() => sessions = val!),
+                  ),
+                ],
+              ),
+            ),
+
             const Spacer(),
-            _buildNavigationButtons(context),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildButton("Back", Colors.grey.shade300, Colors.black, () {
+                    Navigator.pop(context);
+                  }),
+                ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: _buildButton("Next", Colors.lightBlue, Colors.white, () {
+                    // Navigate to next step
+                  }),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDropdown(String label, List<String> options) {
-    String selected = options[0];
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: 10.h),
-          child: DropdownButtonFormField<String>(
-            value: selected,
-            items: options.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-            onChanged: (val) => setState(() => selected = val!),
-            decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
-          ),
-        );
-      },
+  Widget _buildDropdown(String label, String value, List<String> items, ValueChanged<String?> onChanged) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.r), borderSide: BorderSide.none),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+      onChanged: onChanged,
     );
   }
 
-  Widget _buildNavigationButtons(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Back"),
-          ),
+  Widget _buildButton(String text, Color bgColor, Color textColor, VoidCallback onPressed) {
+    return SizedBox(
+      height: 45.h,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bgColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+          elevation: 0,
         ),
-        SizedBox(width: 10.w),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {},
-            child: const Text("Next"),
-          ),
-        ),
-      ],
+        onPressed: onPressed,
+        child: Text(text, style: TextStyle(color: textColor, fontSize: 14.sp)),
+      ),
     );
   }
 }

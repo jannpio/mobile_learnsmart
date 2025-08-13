@@ -36,20 +36,41 @@ class _StudyTechniqueScreenState extends State<StudyTechniqueScreen> {
     },
   ];
 
-  void _navigateToSelectedTechnique() {
-    if (selectedIndex == null) return;
-
-    final screens = [
-      ActiveRecallScreen(moduleTitle: widget.moduleTitle),
-      PomodoroScreen(moduleTitle: widget.moduleTitle),
-      FeynmanScreen(moduleTitle: widget.moduleTitle),
-      RetrievalPracticeScreen(moduleTitle: widget.moduleTitle),
-    ];
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => screens[selectedIndex!]),
-    );
+  void _navigateToTechnique(int index) {
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ActiveRecallScreen(moduleTitle: widget.moduleTitle),
+          ),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PomodoroScreen(moduleTitle: widget.moduleTitle),
+          ),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FeynmanScreen(moduleTitle: widget.moduleTitle),
+          ),
+        );
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RetrievalPracticeScreen(moduleTitle: widget.moduleTitle),
+          ),
+        );
+        break;
+    }
   }
 
   @override
@@ -143,7 +164,9 @@ class _StudyTechniqueScreenState extends State<StudyTechniqueScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: selectedIndex != null ? _navigateToSelectedTechnique : null,
+                onPressed: selectedIndex != null
+                    ? () => _navigateToTechnique(selectedIndex!)
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyan,
                   shape: RoundedRectangleBorder(
