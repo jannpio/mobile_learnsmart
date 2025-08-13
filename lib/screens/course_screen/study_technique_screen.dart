@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:learnsmart_mobile/widgets/custom_font.dart';
+import 'package:learnsmart_mobile/screens/course_screen/techniques_screen/active_recall_screen.dart';
+import 'package:learnsmart_mobile/screens/course_screen/techniques_screen/pomodoro_screen.dart';
+import 'package:learnsmart_mobile/screens/course_screen/techniques_screen/feynman_screen.dart';
+import 'package:learnsmart_mobile/screens/course_screen/techniques_screen/retrieval_practice_screen.dart';
 
 class StudyTechniqueScreen extends StatefulWidget {
   final String moduleTitle;
@@ -27,14 +31,26 @@ class _StudyTechniqueScreenState extends State<StudyTechniqueScreen> {
       "desc": "Explain the topic in your own words, as if teaching someone else, to deepen comprehension."
     },
     {
-      "title": "Spaced Repetition",
-      "desc": "Review the same material at increasing intervals to improve long-term retention."
-    },
-    {
       "title": "Retrieval Practice",
       "desc": "Answer questions or quizzes from memory to actively pull information from your brain and reinforce learning."
     },
   ];
+
+  void _navigateToSelectedTechnique() {
+    if (selectedIndex == null) return;
+
+    final screens = [
+      ActiveRecallScreen(moduleTitle: widget.moduleTitle),
+      PomodoroScreen(moduleTitle: widget.moduleTitle),
+      FeynmanScreen(moduleTitle: widget.moduleTitle),
+      RetrievalPracticeScreen(moduleTitle: widget.moduleTitle),
+    ];
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => screens[selectedIndex!]),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +143,7 @@ class _StudyTechniqueScreenState extends State<StudyTechniqueScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: selectedIndex != null ? () {} : null,
+                onPressed: selectedIndex != null ? _navigateToSelectedTechnique : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyan,
                   shape: RoundedRectangleBorder(
